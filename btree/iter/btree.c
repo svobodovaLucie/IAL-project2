@@ -127,8 +127,13 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
   }
   target->key = tmp->key;
   target->value = tmp->value;
-  if (tmp_prev != NULL)
-    tmp_prev->right = NULL;
+ 
+  if (tmp_prev != NULL) {
+    if (tmp->left != NULL)
+      tmp_prev->right = tmp->left;
+    else
+      tmp_prev->right = NULL;
+  }
   free(tmp);
 }
 
@@ -147,22 +152,40 @@ void bst_replace_by_rightmost(bst_node_t *target, bst_node_t **tree) {
 void bst_delete(bst_node_t **tree, char key) {
   if ((*tree) == NULL)
     return;
+  bst_node_t *tmp = *tree;
+  bst_node_t *prev = *tree ;
+  bool in_left_subtree = false;
 
-  if ((*tree)->key == key) {  // delete this node
-    bst_node_t *tmp = *tree;
-    if(tmp->left == NULL) {
-      *tree = tmp->right;
-      free(tmp);
-    } else if (tmp->right == NULL) {
-      *tree = tmp->left;
-      free(tmp);
-    } else {
-      bst_replace_by_rightmost(*tree, &(*tree)->left);
+  while (tmp != NULL) {
+    if (tmp->key == key)
+      break;
+    prev = tmp;
+    if (tmp->key < key) {
+      tmp = tmp->right;
+      in_left_subtree = false;
+    } else if (tmp->key > key) {
+      tmp = tmp->left;
+      in_left_subtree = true;
     }
-  } else if ((*tree)->key < key) {
-    bst_delete(&(*tree)->right, key);
-  } else if ((*tree)->key > key) {
-    bst_delete(&(*tree)->left, key);
+  }
+  if (tmp == NULL)  // not found
+    return;
+
+  if (tmp->left != NULL && tmp->right != NULL) {
+    bst_replace_by_rightmost(tmp, &(tmp->left));
+  } else {
+    if (tmp->right) {
+      if (in_left_subtree)
+        prev->left = tmp->right;
+      else
+        prev->right = tmp->right;
+    } else {
+      if (in_left_subtree)
+        prev->left = tmp->left;
+      else
+        prev->right = tmp->left;
+    }
+    free(tmp);
   }
 }
 
