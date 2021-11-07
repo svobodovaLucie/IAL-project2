@@ -56,6 +56,8 @@ bool bst_search(bst_node_t *tree, char key, int *value) {
       }
     }
   }
+  if (search)
+    *value = tree->value;
   return search;
 }
 
