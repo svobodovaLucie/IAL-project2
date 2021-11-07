@@ -174,7 +174,7 @@ void bst_delete(bst_node_t **tree, char key) {
   if (tmp->left != NULL && tmp->right != NULL) {
     bst_replace_by_rightmost(tmp, &(tmp->left));
   } else {
-    if (tmp->right) {
+    if (tmp->right != NULL) {
       if (in_left_subtree)
         prev->left = tmp->right;
       else
